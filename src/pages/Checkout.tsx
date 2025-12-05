@@ -12,6 +12,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     customer_name: "",
+    email: "",
     phone_number: "",
     address: "",
   });
@@ -54,13 +55,13 @@ const Checkout = () => {
                 {cart.map((item, i) => (
                     <div key={i} className="flex justify-between text-sm">
                         <span>{item.product.name} (x{item.qty})</span>
-                        <span>${(item.product.price * item.qty).toFixed(2)}</span>
+                        <span>PKR {(item.product.price * item.qty).toLocaleString()}</span>
                     </div>
                 ))}
             </div>
             <div className="border-t pt-2 flex justify-between font-bold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>PKR {total.toLocaleString()}</span>
             </div>
         </div>
 
@@ -72,6 +73,19 @@ const Checkout = () => {
               onChange={(e) =>
                 setFormData({ ...formData, customer_name: e.target.value })
               }
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Email Address</Label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              placeholder="you@example.com"
               required
             />
           </div>

@@ -51,7 +51,7 @@ const Header = () => {
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-xs w-5 h-5 flex items-center justify-center font-semibold rounded-full">
-                  {cart.length}
+                  {cart.reduce((acc, item) => acc + item.qty, 0)}
                 </span>
               </Button>
             </Link>

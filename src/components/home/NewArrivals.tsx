@@ -4,10 +4,14 @@ import { ShoppingCart, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { Product } from "@/types";
+import ProductViewModal from "@/components/products/ProductViewModal";
 
 const NewArrivals = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,6 +29,13 @@ const NewArrivals = () => {
 
     fetchProducts();
   }, []);
+
+  const openProductModal = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -80,7 +91,10 @@ const NewArrivals = () => {
               style={{ animationDelay: `${index * 0.05}s` }}
             >
               {/* Image */}
-              <Link to={`/product/${product._id}`}>
+              <div 
+                className="cursor-pointer"
+                onClick={(e) => openProductModal(e, product)}
+              >
                 <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 relative overflow-hidden">
                   {product.images && product.images.length > 0 ? (
                     <img
@@ -108,23 +122,25 @@ const NewArrivals = () => {
                     {product.category}
                   </span>
                 </div>
-              </Link>
+              </div>
 
               {/* Details */}
               <div className="p-4">
-                <Link to={`/product/${product._id}`}>
-                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                    {product.name}
-                  </h3>
-                </Link>
+                <h3 
+                  className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1 cursor-pointer"
+                  onClick={(e) => openProductModal(e, product)}
+                >
+                  {product.name}
+                </h3>
                 <div className="flex items-center justify-between mt-2">
                   <p className="font-serif font-semibold text-primary">
-                    Rs. {product.price.toLocaleString()}
+                    PKR {product.price.toLocaleString()}
                   </p>
                   <Button
                     size="sm"
                     variant="ghost"
                     className="h-8 w-8 p-0 hover:bg-secondary hover:text-secondary-foreground"
+                    onClick={(e) => openProductModal(e, product)}
                   >
                     <ShoppingCart className="h-4 w-4" />
                   </Button>
@@ -133,6 +149,12 @@ const NewArrivals = () => {
             </div>
           ))}
         </div>
+        
+        <ProductViewModal 
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
       </div>
     </section>
   );

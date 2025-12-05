@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import {
 import api from "../lib/api";
 import { Product } from "../types";
 import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
+import ProductViewModal from "@/components/products/ProductViewModal";
 
 const categories = ["All", "Traditional", "Modern", "Premium", "Everyday"];
 
@@ -21,6 +23,11 @@ const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
+  
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const selectedCategory = searchParams.get("category") || "All";
   const sortBy = searchParams.get("sort") || "default";
@@ -81,6 +88,13 @@ const Shop = () => {
       params.set("sort", value);
     }
     setSearchParams(params);
+  };
+
+  const openProductModal = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedProduct(product);
+    setIsModalOpen(true);
   };
 
   return (
@@ -202,7 +216,10 @@ const Shop = () => {
               style={{ animationDelay: `${index * 0.03}s` }}
             >
               {/* Image */}
-              <Link to={`/product/${product._id || product.id}`}>
+              <div 
+                className="cursor-pointer"
+                onClick={(e) => openProductModal(e, product)}
+              >
                 <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 relative overflow-hidden">
                   {product.images && product.images[0] ? (
                     <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
@@ -223,24 +240,26 @@ const Shop = () => {
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
 
               {/* Details */}
               <div className="p-4">
-                <Link to={`/product/${product._id || product.id}`}>
-                  <h3 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                    {product.name}
-                  </h3>
-                </Link>
+                <h3 
+                  className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1 cursor-pointer"
+                  onClick={(e) => openProductModal(e, product)}
+                >
+                  {product.name}
+                </h3>
                 <div className="flex items-center justify-between mt-2">
                   <p className="font-serif font-semibold text-primary">
-                    Rs. {product.price.toLocaleString()}
+                    PKR {product.price.toLocaleString()}
                   </p>
                   <Button
                     size="sm"
                     variant="ghost"
                     className="h-8 w-8 p-0 hover:bg-secondary hover:text-secondary-foreground"
                     disabled={!product.in_stock}
+                    onClick={(e) => openProductModal(e, product)}
                   >
                     <ShoppingCart className="h-4 w-4" />
                   </Button>
@@ -249,6 +268,12 @@ const Shop = () => {
             </div>
           ))}
         </div>
+
+        <ProductViewModal 
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
 
         {/* Empty State */}
         {filteredProducts.length === 0 && (
