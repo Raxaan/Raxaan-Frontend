@@ -8,11 +8,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-3xl font-arabic font-bold text-secondary">
-                رخشاں
-              </span>
-              <span className="text-xl font-serif font-semibold">Raxan</span>
+            <div className="mb-4">
+              <img 
+                src="/Media/Footer-Logo.png" 
+                alt="Raxan" 
+                className="h-12 md:h-16 w-auto"
+              />
             </div>
             <p className="text-primary-foreground/80 max-w-md leading-relaxed">
               Premium Islamic caps crafted with excellence and tradition. 

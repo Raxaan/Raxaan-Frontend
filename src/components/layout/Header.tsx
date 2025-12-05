@@ -19,13 +19,12 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl md:text-3xl font-arabic font-bold text-primary">
-              رخشاں
-            </span>
-            <span className="text-lg md:text-xl font-serif font-semibold text-foreground hidden sm:block">
-              Raxan
-            </span>
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/Media/Header-Logo.png" 
+              alt="Raxan" 
+              className="h-10 md:h-12 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
