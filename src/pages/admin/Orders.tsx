@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import OrderDetailsModal from "../../components/admin/OrderDetailsModal";
 import api from "../../lib/api";
 import { Order } from "../../types";
 import {
@@ -20,6 +21,8 @@ import { toast } from "sonner";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -44,6 +47,11 @@ const AdminOrders = () => {
     }
   };
 
+  const openOrderModal = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="p-8 space-y-8">
       <h1 className="text-3xl font-bold">Orders</h1>
@@ -60,28 +68,32 @@ const AdminOrders = () => {
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <TableRow key={order._id}>
-              <TableCell className="font-mono text-sm">
-                {order._id?.slice(-6)}
-              </TableCell>
-              <TableCell>
-                <div>{order.customer_name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {order.phone_number}
-                </div>
-              </TableCell>
-              <TableCell>
-                {order.items.map((item, idx) => (
-                  <div key={idx} className="text-sm">
-                    {item.qty}x {item.product_id} ({item.size}, {item.color})
+              <TableRow 
+                key={order._id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => openOrderModal(order)}
+              >
+                <TableCell className="font-mono text-sm">
+                  {order._id?.slice(-6)}
+                </TableCell>
+                <TableCell>
+                  <div>{order.customer_name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {order.phone_number}
                   </div>
-                ))}
-              </TableCell>
-              <TableCell>
-                {/* Calculate total if price was stored in order items, otherwise placeholder */}
-                -
-              </TableCell>
-              <TableCell>
+                </TableCell>
+                <TableCell>
+                  {order.items.map((item, idx) => (
+                    <div key={idx} className="text-sm">
+                      {item.qty}x {item.product_id} ({item.size}, {item.color})
+                    </div>
+                  ))}
+                </TableCell>
+                <TableCell>
+                  {/* Calculate total if price was stored in order items, otherwise placeholder */}
+                  -
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                 <Select
                   defaultValue={order.status}
                   onValueChange={(val) => handleStatusChange(order._id!, val)}
@@ -102,6 +114,12 @@ const AdminOrders = () => {
           ))}
         </TableBody>
       </Table>
+
+      <OrderDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        order={selectedOrder}
+      />
     </div>
   );
 };
