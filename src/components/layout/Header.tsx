@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCart } from "../../context/CartContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { cart } = useCart();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -41,14 +43,16 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <User className="h-5 w-5" />
-            </Button>
+            <Link to="/admin/login">
+                <Button variant="ghost" size="icon" className="hidden md:flex" title="Admin Login">
+                <User className="h-5 w-5" />
+                </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-xs w-5 h-5 flex items-center justify-center font-semibold">
-                  0
+                <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-xs w-5 h-5 flex items-center justify-center font-semibold rounded-full">
+                  {cart.length}
                 </span>
               </Button>
             </Link>
@@ -78,7 +82,7 @@ const Header = () => {
                 </Link>
               ))}
               <Link
-                to="/admin"
+                to="/admin/login"
                 className="text-muted-foreground hover:text-primary font-medium transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,38 +11,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Mock products - will be replaced with database fetch
-const allProducts = [
-  { id: 1, name: "Classic White Kufi", price: 850, category: "Traditional", inStock: true },
-  { id: 2, name: "Embroidered Black Cap", price: 1200, category: "Premium", inStock: true },
-  { id: 3, name: "Cotton Blend Taqiyah", price: 650, category: "Everyday", inStock: true },
-  { id: 4, name: "Gold Thread Kufi", price: 1500, category: "Premium", inStock: false },
-  { id: 5, name: "Mesh Breathable Cap", price: 750, category: "Modern", inStock: true },
-  { id: 6, name: "Velvet Prayer Cap", price: 950, category: "Traditional", inStock: true },
-  { id: 7, name: "Striped Cotton Kufi", price: 700, category: "Everyday", inStock: true },
-  { id: 8, name: "Silk Finish Cap", price: 1350, category: "Premium", inStock: true },
-  { id: 9, name: "Linen Summer Cap", price: 800, category: "Modern", inStock: true },
-  { id: 10, name: "Wool Winter Kufi", price: 1100, category: "Traditional", inStock: true },
-  { id: 11, name: "Crochet Pattern Cap", price: 900, category: "Everyday", inStock: false },
-  { id: 12, name: "Geometric Design Kufi", price: 1250, category: "Premium", inStock: true },
-];
+import api from "../lib/api";
+import { Product } from "../types";
+import { toast } from "sonner";
 
 const categories = ["All", "Traditional", "Modern", "Premium", "Everyday"];
 
 const Shop = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   
   const selectedCategory = searchParams.get("category") || "All";
   const sortBy = searchParams.get("sort") || "default";
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await api.get("/products");
+        setProducts(res.data);
+      } catch (error) {
+        toast.error("Failed to load products");
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    let products = [...allProducts];
+    let filtered = [...products];
     
     // Filter by category
     if (selectedCategory !== "All") {
-      products = products.filter(
+      filtered = filtered.filter(
         (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
@@ -50,18 +50,18 @@ const Shop = () => {
     // Sort
     switch (sortBy) {
       case "price-asc":
-        products.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => a.price - b.price);
         break;
       case "price-desc":
-        products.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => b.price - a.price);
         break;
       case "name":
-        products.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
     }
     
-    return products;
-  }, [selectedCategory, sortBy]);
+    return filtered;
+  }, [products, selectedCategory, sortBy]);
 
   const handleCategoryChange = (category: string) => {
     const params = new URLSearchParams(searchParams);
@@ -197,22 +197,26 @@ const Shop = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {filteredProducts.map((product, index) => (
             <div
-              key={product.id}
+              key={product._id || product.id}
               className="group bg-card border border-border overflow-hidden transition-all hover:shadow-elegant animate-fade-in"
               style={{ animationDelay: `${index * 0.03}s` }}
             >
               {/* Image */}
-              <Link to={`/product/${product.id}`}>
+              <Link to={`/product/${product._id || product.id}`}>
                 <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
-                  </div>
+                  {product.images && product.images[0] ? (
+                    <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
+                    </div>
+                  )}
                   {/* Badges */}
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     <span className="bg-primary text-primary-foreground text-xs px-2 py-1 font-medium">
                       {product.category}
                     </span>
-                    {!product.inStock && (
+                    {!product.in_stock && (
                       <span className="bg-destructive text-destructive-foreground text-xs px-2 py-1 font-medium">
                         Out of Stock
                       </span>
@@ -223,7 +227,7 @@ const Shop = () => {
 
               {/* Details */}
               <div className="p-4">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product._id || product.id}`}>
                   <h3 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
                     {product.name}
                   </h3>
@@ -236,7 +240,7 @@ const Shop = () => {
                     size="sm"
                     variant="ghost"
                     className="h-8 w-8 p-0 hover:bg-secondary hover:text-secondary-foreground"
-                    disabled={!product.inStock}
+                    disabled={!product.in_stock}
                   >
                     <ShoppingCart className="h-4 w-4" />
                   </Button>
