@@ -1,20 +1,55 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, ArrowRight } from "lucide-react";
-
-// Mock products - will be replaced with database fetch later
-const products = [
-  { id: 1, name: "Classic White Kufi", price: 850, category: "Traditional" },
-  { id: 2, name: "Embroidered Black Cap", price: 1200, category: "Premium" },
-  { id: 3, name: "Cotton Blend Taqiyah", price: 650, category: "Everyday" },
-  { id: 4, name: "Gold Thread Kufi", price: 1500, category: "Premium" },
-  { id: 5, name: "Mesh Breathable Cap", price: 750, category: "Modern" },
-  { id: 6, name: "Velvet Prayer Cap", price: 950, category: "Traditional" },
-  { id: 7, name: "Striped Cotton Kufi", price: 700, category: "Everyday" },
-  { id: 8, name: "Silk Finish Cap", price: 1350, category: "Premium" },
-];
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
+import { Product } from "@/types";
 
 const NewArrivals = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/products/");
+        // Get the latest 8 products
+        const latestProducts = response.data.slice(0, 8);
+        setProducts(latestProducts);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-muted-foreground">No products available yet.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -40,16 +75,24 @@ const NewArrivals = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {products.map((product, index) => (
             <div
-              key={product.id}
+              key={product._id}
               className="group bg-card border border-border overflow-hidden transition-all hover:shadow-elegant animate-fade-in"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
               {/* Image */}
-              <Link to={`/product/${product.id}`}>
+              <Link to={`/product/${product._id}`}>
                 <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
-                  </div>
+                  {product.images && product.images.length > 0 ? (
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
+                    </div>
+                  )}
                   {/* Category badge */}
                   <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 font-medium">
                     {product.category}
@@ -59,7 +102,7 @@ const NewArrivals = () => {
 
               {/* Details */}
               <div className="p-4">
-                <Link to={`/product/${product.id}`}>
+                <Link to={`/product/${product._id}`}>
                   <h3 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
                     {product.name}
                   </h3>

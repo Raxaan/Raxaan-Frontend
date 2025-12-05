@@ -74,12 +74,13 @@ const Hero = () => {
               <div className="absolute -top-4 -left-4 w-24 h-24 border-2 border-secondary" />
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10" />
               
-              {/* Main image placeholder */}
-              <div className="relative z-10 aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <span className="text-6xl font-arabic text-primary">رخشاں</span>
-                  <p className="mt-4 text-muted-foreground">Premium Islamic Cap</p>
-                </div>
+              {/* Main image */}
+              <div className="relative z-10 aspect-square overflow-hidden shadow-2xl">
+                <img 
+                  src="https://plus.unsplash.com/premium_photo-1678559460700-8a1d42ce8239?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  alt="Premium Islamic Cap"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
