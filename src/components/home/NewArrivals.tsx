@@ -87,12 +87,22 @@ const NewArrivals = () => {
                       src={product.images[0]}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        // Fallback to placeholder if image fails to load
+                        e.currentTarget.style.display = 'none';
+                        const placeholder = e.currentTarget.nextElementSibling;
+                        if (placeholder) {
+                          (placeholder as HTMLElement).style.display = 'flex';
+                        }
+                      }}
                     />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
-                    </div>
-                  )}
+                  ) : null}
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ display: product.images && product.images.length > 0 ? 'none' : 'flex' }}
+                  >
+                    <span className="text-4xl font-arabic text-primary/30">رخشاں</span>
+                  </div>
                   {/* Category badge */}
                   <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 font-medium">
                     {product.category}

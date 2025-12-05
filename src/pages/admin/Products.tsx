@@ -89,6 +89,9 @@ const AdminProducts = () => {
       colors: colorsInput.split(",").map((s) => s.trim()).filter(Boolean),
     };
 
+    console.log("Submitting product data:", dataToSubmit);
+    console.log("Images in formData:", formData.images);
+
     try {
       if (editingProduct && editingProduct._id) {
         await api.put(`/products/${editingProduct._id}`, dataToSubmit);
@@ -99,7 +102,8 @@ const AdminProducts = () => {
       }
       setIsOpen(false);
       fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Product submission error:", error.response?.data || error);
       toast.error("Operation failed");
     }
   };
