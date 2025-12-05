@@ -6,28 +6,28 @@ const collections = [
     id: 1,
     name: "Traditional",
     description: "Classic designs honoring heritage",
-    image: "🕌",
+    image: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=500&h=500&fit=crop",
     count: 24,
   },
   {
     id: 2,
     name: "Modern",
     description: "Contemporary styles for today",
-    image: "✨",
+    image: "https://images.unsplash.com/photo-1583391733981-5ade7d900a6b?w=500&h=500&fit=crop",
     count: 18,
   },
   {
     id: 3,
     name: "Premium",
     description: "Luxury craftsmanship",
-    image: "⭐",
+    image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=500&h=500&fit=crop",
     count: 12,
   },
   {
     id: 4,
     name: "Everyday",
     description: "Comfortable daily wear",
-    image: "☀️",
+    image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=500&h=500&fit=crop",
     count: 30,
   },
 ];
@@ -55,8 +55,12 @@ const Collections = () => {
               className="group relative bg-card border border-border overflow-hidden transition-all hover:shadow-elegant hover:border-primary/30 animate-fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/10">
-                <span className="text-6xl">{collection.image}</span>
+              <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/10 overflow-hidden">
+                <img 
+                  src={collection.image} 
+                  alt={collection.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
               </div>
               
               <div className="p-4 md:p-6">

@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash } from "lucide-react";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,7 +41,6 @@ const AdminProducts = () => {
   });
 
   // Helper for comma-separated inputs
-  const [imagesInput, setImagesInput] = useState("");
   const [sizesInput, setSizesInput] = useState("");
   const [colorsInput, setColorsInput] = useState("");
 
@@ -61,7 +61,6 @@ const AdminProducts = () => {
     if (product) {
       setEditingProduct(product);
       setFormData(product);
-      setImagesInput(product.images.join(", "));
       setSizesInput(product.sizes.join(", "));
       setColorsInput(product.colors.join(", "));
     } else {
@@ -76,7 +75,6 @@ const AdminProducts = () => {
         colors: [],
         in_stock: true,
       });
-      setImagesInput("");
       setSizesInput("");
       setColorsInput("");
     }
@@ -87,7 +85,6 @@ const AdminProducts = () => {
     e.preventDefault();
     const dataToSubmit = {
       ...formData,
-      images: imagesInput.split(",").map((s) => s.trim()).filter(Boolean),
       sizes: sizesInput.split(",").map((s) => s.trim()).filter(Boolean),
       colors: colorsInput.split(",").map((s) => s.trim()).filter(Boolean),
     };
@@ -116,6 +113,10 @@ const AdminProducts = () => {
     } catch (error) {
       toast.error("Delete failed");
     }
+  };
+
+  const handleImagesUploaded = (urls: string[]) => {
+    setFormData({ ...formData, images: urls });
   };
 
   return (
@@ -228,11 +229,11 @@ const AdminProducts = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Images (Comma separated URLs)</Label>
-              <Input
-                value={imagesInput}
-                onChange={(e) => setImagesInput(e.target.value)}
-                placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"
+              <Label>Product Images</Label>
+              <ImageUpload
+                onImagesUploaded={handleImagesUploaded}
+                existingImages={formData.images || []}
+                maxImages={5}
               />
             </div>
 

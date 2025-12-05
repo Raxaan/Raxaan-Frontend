@@ -13,19 +13,37 @@ const AdminLogin = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔐 Starting login process...");
     try {
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
+      // Use URLSearchParams for proper form-urlencoded format
+      const params = new URLSearchParams();
+      params.append("username", username);
+      params.append("password", password);
 
-      const response = await api.post("/auth/login", formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      console.log("📤 Sending login request...");
+      const response = await api.post("/auth/login", params, {
+        headers: { 
+          "Content-Type": "application/x-www-form-urlencoded" 
+        },
       });
 
-      localStorage.setItem("token", response.data.access_token);
-      toast.success("Login successful");
-      navigate("/admin");
-    } catch (error) {
+      console.log("✅ Response received:", response);
+      console.log("📦 Response data:", response.data);
+      console.log("🔑 Access token:", response.data.access_token);
+
+      if (response.data.access_token) {
+        localStorage.setItem("token", response.data.access_token);
+        toast.success("Login successful");
+        navigate("/admin");
+      } else {
+        console.error("❌ No access token in response!");
+        toast.error("Invalid response from server");
+      }
+    } catch (error: any) {
+      console.error("❌ Login error:", error);
+      console.error("📋 Error response:", error.response);
+      console.error("📋 Error data:", error.response?.data);
+      console.error("📋 Error status:", error.response?.status);
       toast.error("Invalid credentials");
     }
   };
